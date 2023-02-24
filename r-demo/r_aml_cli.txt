@@ -1,0 +1,3 @@
+az ml job create -f job.yml --workspace-name "" --resource-group "" -s
+az ml job show -n "" -g "" -w ""
+az ml model create --name "RModelFromRStudio" --version 1 --path azureml://jobs/<job-name>/outputs/artifacts/paths/model/ --type mlflow_model --resource-group "" --workspace-name ""
