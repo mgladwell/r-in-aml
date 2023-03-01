@@ -1,41 +1,25 @@
+# import packages
+
+library(readr)
 library(reticulate)
+azureml.fsspec <- import("azureml.fsspec")
 
-# install the azureml module in the new virtual environment
-#system("pip install azureml")
-#system("pip install -U azureml-fsspec mltable")
-system("pip install azure-ml")
+# Azure Machine Learning workspace details
+subscription <- ''
+resource_group <- ''
+workspace <- ''
+datastore_name <- 'blob_example'
+path_on_datastore <- '/iris.csv'
 
-library(reticulate)
+fs$ls()
 
-# import required modules
-az_identity <- import("azure.identity")
-azureml <- import("azureml")
-ml_client <- import("azure.ai.ml", convert = FALSE)$MLClient
-azure_ml_fs <- import("azureml.fsspec", convert = FALSE)$AzureMachineLearningFileSystem
+# create filesystem object
+fs <- azureml.fsspec$AzureMachineLearningFileSystem(paste0("azureml://subscriptions/", subscription, "/resourcegroups/", resource_group, "/workspaces/", workspace, "/datastores/", datastore_name, "/paths/", path_on_datastore, sep = ""))
 
-# Import the necessary modules
-az_core <- import("azure.core")
-az_ml <- import("azure.ml")
-az_ml_auth <- import("azureml.core.authentication")
+with(fs$open("blob_example/iris.csv", "r") %as% f, {
+  b <- f$read()
+  x <- as.character(b, encoding = "utf-8")
+  df <- read.csv(text=x, header = TRUE, sep=",")
+})
 
-# Load the workspace from the config file
-workspace <- tryCatch(
-  {
-    # Try to load the workspace with the default authentication method
-    az_ml$Workspace$from_config()
-  },
-  error = function(e) {
-    # If default authentication fails, use interactive authentication
-    az_ml$Workspace$from_config(auth=az_ml_auth$InteractiveLoginAuthentication())
-  }
-)
-
-# create an instance of the AzureMachineLearningFileSystem
-azure_ml_fs <- azureml$fsspec$AzureMachineLearningFileSystem("azureml://subscriptions/s/resourcegroups/rg/workspaces/ws/datastores/ds/paths/path/folder/folder")
-
-# list files in the path
-azure_ml_fs$ls()
-
-
-
-
+print(df)
