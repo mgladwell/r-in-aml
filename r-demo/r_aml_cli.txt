@@ -1,7 +1,14 @@
+
+1) This will run a job, and stream the output: 
 az ml job create -f job.yml --workspace-name "" --resource-group "" -s
+
+2) This showcases the jobs under "name" that are being worked on.
 az ml job show -n "" -g "" -w ""
+
+3) This allows for a model to be registed from a Job Output.
 az ml model create --name "RModelFromRStudio" --version 1 --path azureml://jobs/<job-name>/outputs/artifacts/paths/model/ --type mlflow_model --resource-group "" --workspace-name ""
 
+4) Optional! Can use this to create a Datastore from within the CLI
 Create Datastore and Asset for Connecting:
 az ml datastore create --file storage_account.yml -g AML_Demo -w AMLDemo
 
